@@ -1,0 +1,48 @@
+﻿<html>
+<head>
+	<link rel="stylesheet" href="./bootstrap/css/bootstrap.min.css">
+	<script src="../jquery/jquery-3.2.0.min.js"></script>
+	<script src="./bootstrap/js/bootstrap.min.js"></script>
+	<style>
+	body {
+		width: 300px;
+		height: 100px;
+	}
+	</style>
+</head>
+<body>
+<div class="container" id="main-container">
+<!--navbar-->
+<ul class="nav nav-tabs" id="head-navbar" role="tablist">
+	<li role="presentation" class="active"><a href="#duedate-nav" role="tab" data-toggle="tab">到期日</a></li>
+	<li role="presentation"><a href="#other-nav" role="tab" data-toggle="tab">其他</a></li>
+</ul>
+
+<!--tab panes-->
+<div class="tab-content" style="padding-top: 10px">
+	<div role="tabpanel" class="tab-pane fade in active" id="duedate-nav">
+		<form class="form-horizontal" id="duedate-form">
+			<div class="form-group">
+				<label class="col-xs-4 radio-inline">
+					<input type="checkbox" id="duedate-now">
+					今天
+				</label>
+				<div class="col-xs-8">
+					<input type="date" class="form-control" id="duedate-input">
+				</div>
+			</div>
+
+			<button type="submit" class="btn btn-primary" id="duedate-button">确认</button>
+		</form>
+	</div>
+
+	<div role="tabpanel" class="tab-pane fade" id="other-nav">
+		<button type="button" class="btn btn-danger" id="danger-button">加需求</button>
+	</div>
+</div>
+
+</div>
+
+	<script src="../js/popup.js"></script>
+</body>
+</html>

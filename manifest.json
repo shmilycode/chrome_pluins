@@ -1,0 +1,112 @@
+{
+  // Required
+  "manifest_version": 2,
+  "name": "jira自动插件",
+  "version": "20170420.001",
+
+  // Recommended
+//  "default_locale": "en",
+  "description": "jira插件",
+
+  "icons": {
+	  "16":	"./images/1.png",
+	  "48": "./images/2.png",
+	  "128": "./images/3.png"
+  },
+
+  "permissions": [
+	  "tabs",
+	"webRequest",
+	"webRequestBlocking",
+	"storage",
+	"https://jira.cvte.com/*"
+	],
+
+
+  // Pick one (or none)
+  "browser_action": {
+	  "default_title": "",
+//	  "default_icon": "icon_1.png",
+	  "default_popup": "./popup/popup.html"
+  },
+
+//  "page_action": {...},
+  // Optional
+  "author": "iqiew",
+//  "automation": ...,
+  "background": {
+    // Recommended
+	"scripts": ["./jquery/jquery-3.2.0.min.js", "./js/eventPage.js"]
+  },
+
+  /*
+  "background_page": ...,
+  "chrome_settings_overrides": {...},
+  "chrome_ui_overrides": {
+    "bookmarks_ui": {
+      "remove_bookmark_shortcut": true,
+      "remove_button": true
+    }
+  },
+  "chrome_url_overrides": {...},
+  "commands": {...},
+  "content_capabilities": ...,
+  */
+  "content_scripts": [
+	{
+//		"matches": ["https://jira.cvte.com/*"],
+		"matches": ["https://*/*"],
+		"js": ["./jquery/jquery-3.2.0.min.js", "./js/autorun.js"]
+	}
+  ]
+  /*
+  "content_security_policy": "policyString",
+  "converted_from_user_script": ...,
+  "current_locale": ...,
+  "devtools_page": "devtools.html",
+  "event_rules": [{...}],
+  "externally_connectable": {
+    "matches": ["*://*.example.com/*"]
+  },
+  "file_browser_handlers": [...],
+  "file_system_provider_capabilities": {
+    "configurable": true,
+    "multiple_mounts": true,
+    "source": "network"
+  },
+  "homepage_url": "http://path/to/homepage",
+  "import": [{"id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"}],
+  "incognito": "spanning, split, or not_allowed",
+  "input_components": ...,
+  "key": "publicKey",
+  "minimum_chrome_version": "versionString",
+  "nacl_modules": [...],
+  "oauth2": ...,
+  "offline_enabled": true,
+  "omnibox": {
+    "keyword": "aString"
+  },
+  "optional_permissions": ["tabs"],
+  "options_page": "options.html",
+  "options_ui": {
+    "chrome_style": true,
+    "page": "options.html"
+  },
+  "permissions": ["tabs"],
+  "platforms": ...,
+  "plugins": [...],
+  "requirements": {...},
+  "sandbox": [...],
+  "short_name": "Short Name",
+  "signature": ...,
+  "spellcheck": ...,
+  "storage": {
+    "managed_schema": "schema.json"
+  },
+  "system_indicator": ...,
+  "tts_engine": {...},
+  "update_url": "http://path/to/updateInfo.xml",
+  "version_name": "aString",
+  "web_accessible_resources": [...]
+  */
+}
