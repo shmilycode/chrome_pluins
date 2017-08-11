@@ -12,19 +12,43 @@ BGMention: function(log){
 },
 };
 
-$.turnTestUrlRegExp = 
+$.turnTestUrlRegExp =
 		/https:\/\/jira.cvte.com\/secure\/WorkflowUIDispatcher.jspa\?id=(\d+)?\&action=(\d+)?\&atl_token=(\w{4}-\w{4}-\w{4}-\w{4}\|\w+?\|lin)\&decorator=dialog\&inline=true\&\_=(\d+)?/;
 
-$.autoRunPort = 0;
 $.popUpPort = 0;
 $.username = "none";
 $.testActionId = 61;
+
+$.portManager = {
+autoRunPortList : {},
+
+addPort:  function(tab_id, new_port)
+{
+	if(new_port)
+	{
+		this.autoRunPortList[tab_id] = new_port;
+		$.BGLog.BGMention("Add port: "+tab_id+"	--> "+new_port);
+	}
+},
+
+getPort: function(tab_id)
+{
+	return autoRunPortList[tab_id];
+},
+
+deletePort: function(tab_id)
+{
+	delete autoRunPortList["tab_id"];
+},
+
+};
 
 chrome.runtime.onConnect.addListener(function(port){
 	if(port.name == "autorun")
 	{
 		$.BGLog.BGMention("AutoRun port is connected!");
-		$.autoRunPort = port;
+		var tabID = port.sender.tab.id;
+		$.portManager.addPort(tabID, port);
 	}
 	else if(port.name == "popup")
 	{
@@ -32,9 +56,9 @@ chrome.runtime.onConnect.addListener(function(port){
 		$.popUpPort = port;
 	}
 
-	if($.autoRunPort)
+	if(port)
 	{
-		$.autoRunPort.onMessage.addListener(function(message)
+		port.onMessage.addListener(function(message)
 		{
 			if("set_username" == message.option)
 			$.username = message.value.username;
@@ -78,7 +102,7 @@ initDuedate: function()
 {
 	chrome.storage.local.get("duedate_now", function(value){
 		if(value.duedate_now == true)
-		{	
+		{
 			var input_date = $.background.getToday();
 			chrome.storage.local.set({'duedate_input': input_date}, function(){
 				$.BGLog.BGMention("initDuedate: set duedate_input: "+input_date);
@@ -87,7 +111,7 @@ initDuedate: function()
 	});
 },
 
-setDuedate: function(issue_ID, ALT_token, DueDate)
+setDuedate: function(tab_id, issue_ID, ALT_token, DueDate)
 {
 	var message = {
 		option: "set_duedate",
@@ -101,16 +125,18 @@ setDuedate: function(issue_ID, ALT_token, DueDate)
 			singleField: true
 		}
 	};
-	if($.autoRunPort)
+
+	current_port = $.portManager.getPort(tab_id);
+	if(current_port)
 	{
 		$.BGLog.BGMention("postMessage: "+message);
-		$.autoRunPort.postMessage(message);
+		current_port.postMessage(message);
 	}
 	else
 	{
 		alert("修改到期日失败！");
 	}
-},		
+},
 
 monthInChinese: ["一月", "二月", "三月", "四月", "五月", "六月", "七月",
 	"八月", "九月", "十月", "十一月", "十二月"],
@@ -154,7 +180,7 @@ function(details){
 			duedate = $.background.convertDate(duedate);
 			if(duedate != undefined && urlmsg_arr[2] == $.testActionId)
 			{
-				$.background.setDuedate(urlmsg_arr[1], urlmsg_arr[3], duedate);
+				$.background.setDuedate(details.tabId, urlmsg_arr[1], urlmsg_arr[3], duedate);
 			}
 		});
 	}

@@ -1,12 +1,31 @@
 ﻿<html>
 <head>
 	<link rel="stylesheet" href="./bootstrap/css/bootstrap.min.css">
+	<link rel="stylesheet" href="./bootstrap/css/bootstrap-switch.min.css">
 	<script src="../jquery/jquery-3.2.0.min.js"></script>
 	<script src="./bootstrap/js/bootstrap.min.js"></script>
+	<script src="./bootstrap/js/bootstrap-switch.min.js"></script>
 	<style>
 	body {
-		width: 300px;
+		width: 320px;
 		height: 100px;
+	}
+
+	.align-left {
+		padding-right: 0px;
+	}
+
+	.date-input-padding{
+		padding-left: 7px;
+	}
+
+	.without-padding{
+		padding-right: 0px;
+		padding-left: 0px;
+	}
+
+	.align-middle{
+		display: block;
 	}
 	</style>
 </head>
@@ -14,27 +33,57 @@
 <div class="container" id="main-container">
 <!--navbar-->
 <ul class="nav nav-tabs" id="head-navbar" role="tablist">
-	<li role="presentation" class="active"><a href="#duedate-nav" role="tab" data-toggle="tab">到期日</a></li>
+	<li role="presentation" class="active"><a href="#duedate-nav" role="tab" data-toggle="tab">选项</a></li>
 	<li role="presentation"><a href="#other-nav" role="tab" data-toggle="tab">其他</a></li>
 </ul>
 
 <!--tab panes-->
 <div class="tab-content" style="padding-top: 10px">
+	<!--duedate-tab-->
 	<div role="tabpanel" class="tab-pane fade in active" id="duedate-nav">
+		<!-- duedate-form -->
 		<form class="form-horizontal" id="duedate-form">
+			<label class="col-xs-2 radio-inline without-padding">
+				到期日
+			</label>
 			<div class="form-group">
-				<label class="col-xs-4 radio-inline">
-					<input type="checkbox" id="duedate-now">
-					今天
-				</label>
-				<div class="col-xs-8">
-					<input type="date" class="form-control" id="duedate-input">
+				<div class="col-xs-6 date-input-padding">
+					<input type="date" class="align-left form-control" id="duedate-input">
+				</div>
+				<div class="bootstrap-switch bootstrap-switch-wrapper bootstrap-switch-mini">
+					<input type="checkbox" id="enable-duedate-checkbox" checked>
 				</div>
 			</div>
-
-			<button type="submit" class="btn btn-primary" id="duedate-button">确认</button>
+			<!-- <button type="submit" class="btn btn-primary" id="duedate-button">确认</button> -->
 		</form>
-	</div>
+
+		<!-- complete-date-form -->
+		<form class="form-horizontal" id="complete-date-form">
+			<label class="col-xs-2 radio-inline without-padding">
+				实际完成日
+			</label>
+			<div class="form-group">
+				<div class="col-xs-6 date-input-padding">
+					<input type="date" class="align-left form-control" id="complete-date-input">
+				</div>
+				<div class="bootstrap-switch bootstrap-switch-wrapper bootstrap-switch-mini form-contro">
+					<input type="checkbox" id="enable-complete-date-checkbox" checked>
+				</div>
+			</div>
+		</form>
+
+		<!-- processing-time-form -->
+		<form class="form-horizontal" id="processing-time-form">
+			<label class="col-xs-2 radio-inline without-padding">
+				耗费时间
+			</label>
+			<div class="form-group">
+				<div class="bootstrap-switch bootstrap-switch-wrapper bootstrap-switch-mini form-contro">
+					<input type="checkbox" id="enable-processing-time-checkbox" checked>
+				</div>
+			</div>
+		</form>
+	</div> <!--duedate-nav-->
 
 	<div role="tabpanel" class="tab-pane fade" id="other-nav">
 		<button type="button" class="btn btn-danger" id="danger-button">加需求</button>

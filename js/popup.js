@@ -13,101 +13,217 @@ PopupMention: function(log){
 };
 
 $.PopupItemsId = {
+//duedate id
 duedate_form: "duedate-form",
-
 duedate_input: "duedate-input",
-
-duedate_checkbox: "duedate-now",
-
+duedate_checkbox: "enable-duedate-checkbox",
 duedate_button: "duedate-button",
+
+//complete date id
+complete_date_form: "complete-date-form",
+complete_date_input: "complete-date-input",
+complete_date_checkbox: "enable-complete-date-checkbox",
+complete_date_button: "complete-date-button",
+
+//procesing time id
+processing_time_form: "processing-time-form",
+processing_time_checkbox: "enable-processing-time-checkbox",
 };
 
-$("#" + $.PopupItemsId.duedate_form).submit(function(datas){
+//data index
+$.DataIndex = {
+enable_duedate: "enable_dudate",
+enable_complete_date: "enable_complete_date",
+duedate_input: "duedate_input",
+duedate_now: "duedate_now",
+complete_date_input: "complete_date_input",
+};
+
+$.StorageManager = {
+SaveDictionaryData: function(data)
+{
+	chrome.storage.local.set(data, function(){
+		$.PopupLog.PopupMention("Date saved!");
+	});
+}
+}
+
+//////////////////////////////////////////////////////////////////////////
+///////////////////////duedate event handle///////////////////////////////
+//////////////////////////////////////////////////////////////////////////
+$.DuedateHandler = {
+onDuedateSwitchChange: function(event, state)
+{
+	var enabled = state;
+	if(true == enabled){
+		$('#'+$.PopupItemsId.duedate_input).attr('disabled',  false);
+	}
+	else {
+		$('#'+$.PopupItemsId.duedate_input).attr('disabled',  true);
+	}
+	$.StorageManager.SaveDictionaryData({"enable_duedate": enabled});
+	return false;
+},
+
+onDuedateFormSubmit: function(dates)
+{
 	var input_date = $("#" + $.PopupItemsId.duedate_input).val();
-	var selected = $("#"+$.PopupItemsId.duedate_checkbox).prop('checked');
 	if(input_date)
 	{
-		var data = {'duedate_input': input_date, 'duedate_now': selected};
-		chrome.storage.local.set(data, function(){
-			$.PopupLog.PopupMention("input_date saved!");
-		});
+		var data = {"duedate_input": input_date,
+			 "enable_duedate": true};
+		$.StorageManager.SaveDictionaryData(data);
 
 		var dataToSend = {option: 'update_duedate', value: data};
 		chrome.runtime.sendMessage(dataToSend, function(response){
 			$.PopupLog.PopupMention("popup send data to background!");
 		});
+	}
 
-		$.WQ_Animation.buttonMoveAnimation(300, true, function(){
-			$("#"+$.PopupItemsId.duedate_button).prop('disabled', true);
+	//necessary
+	return false;
+},
+
+onDuedateInputChange: function()
+{
+	$.DuedateHandler.onDuedateFormSubmit();
+	return false;
+},
+};
+///////////////////////duedate event handle end///////////////////////////////
+//////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////
+///////////////////////complete date event handle/////////////////////////
+$.CompleteDateHandler = {
+
+onCompleteDateSwitchChange: function(event, state)
+{
+	var enabled = state;
+	if(true == enabled){
+		$('#'+$.PopupItemsId.complete_date_input).attr('disabled', false);
+	}
+	else {
+		$('#'+$.PopupItemsId.complete_date_input).attr('disabled', true);
+	}
+	//store it
+	$.StorageManager.SaveDictionaryData({"enable_complete_date": enabled});
+	return false;
+},
+
+onCompleteDateFormSubmit: function(datas)
+{
+	var input_date = $("#" + $.PopupItemsId.complete_date_input).val();
+	if(input_date)
+	{
+		var data = {"complete_date_input": input_date,
+			 "enable_complete_date": true};
+		$.StorageManager.SaveDictionaryData(data);
+
+		var dataToSend = {option: 'update_complete_date', value: data};
+		chrome.runtime.sendMessage(dataToSend, function(response){
+			$.PopupLog.PopupMention("popup send data to background!");
 		});
 	}
 
 	//necessary
 	return false;
-});
+},
 
-$("#"+$.PopupItemsId.duedate_checkbox).change(function(datas){
-	var isChecked = $("#"+$.PopupItemsId.duedate_checkbox).prop('checked');
-	if(true == isChecked){
-		var current_date = new Date();
-		var year = current_date.getFullYear();
-		var mon = ("0" + (current_date.getMonth() + 1)).slice(-2);
-		var day = ("0" + current_date.getDate()).slice(-2);
-
-		$("#"+$.PopupItemsId.duedate_input).val(year + '-' + mon + '-' + day);
-	}
-	$.WQ_Animation.buttonMoveAnimation(300, false, function(){
-		$("#"+$.PopupItemsId.duedate_button).prop('disabled', false);
-	});
+onCompleteDateInputChange: function()
+{
+	$.CompleteDateHandler.onCompleteDateFormSubmit();
 	return false;
-});
-
-$("#"+$.PopupItemsId.duedate_input).change(function(){
-	$("#"+$.PopupItemsId.duedate_checkbox).prop('checked', false);
-	$.WQ_Animation.buttonMoveAnimation(300, false, function(){
-		$("#"+$.PopupItemsId.duedate_button).prop('disabled', false);
-	});
-	return false;
-});
+},
+};
+///////////////////////complete date event handle end/////////////////////////
+//////////////////////////////////////////////////////////////////////////
 
 $("#danger-button").click(function(){
 	alert("看什么看，自己加！");
 });
 
+$.PopupUI = {
+initUI: function()
+{
+	$.PopupUI.initDuedateForm();
+	$.PopupUI.initCompleteDateForm();
+	$.PopupUI.initProcessingTimeForm();
+},
+
+initDuedateForm: function()
+{
+	$('#'+$.PopupItemsId.duedate_checkbox).bootstrapSwitch();
+	$("#"+$.PopupItemsId.duedate_checkbox).on('switchChange.bootstrapSwitch', $.DuedateHandler.onDuedateSwitchChange);
+	$("#"+$.PopupItemsId.duedate_input).change($.DuedateHandler.onDuedateInputChange);
+},
+
+initCompleteDateForm: function()
+{
+	$('#'+$.PopupItemsId.complete_date_checkbox).bootstrapSwitch();
+	$("#"+$.PopupItemsId.complete_date_checkbox).on('switchChange.bootstrapSwitch', $.CompleteDateHandler.onCompleteDateSwitchChange);
+	$("#"+$.PopupItemsId.complete_date_input).change($.CompleteDateHandler.onCompleteDateInputChange);
+},
+
+initProcessingTimeForm: function()
+{
+	$('#' + $.PopupItemsId.processing_time_checkbox).bootstrapSwitch();
+}
+};
+
 $.PopupManager = {
 initManager: function()
 {
-	chrome.storage.local.get("duedate_now", function(value){
+	$.PopupManager.restoreDefaultDatabase();
+	$.PopupManager.initDuedateInput();
+	$.PopupManager.initDuedateCheckBox();
+	$.PopupManager.initCompleteDateInput();
+	$.PopupManager.initCompleteDateCheckBox();
+},
+
+restoreDefaultDatabase: function()
+{
+	chrome.storage.local.get("enable_duedate", function(value){
 		if(value.duedate_now == undefined)
 		{
-			chrome.storage.local.set({'duedate_now': true}, function(){});
+			$.StorageManager.SaveDictionaryData({"enable_duedate": true});
 		}
 	});
 	chrome.storage.local.get("duedate_input", function(value){
 		if(value.duedate_input == undefined)
 		{
-			$.Popupmanager.setDuedateCurrentTime();
+			$.Popupmanager.setInputBoxCurrentTime($.PopupItemsId.duedate_input);
 			var input_date = $("#" + $.PopupItemsId.duedate_input).val();
 			if(input_date)
 			{
-				chrome.storage.local.set({'duedate_input': input_date}, function(){});
+				$.StorageManager.SaveDictionaryData({"duedate_input": input_date});
 			}
 		}
 	});
-	$.PopupManager.initDuedateInput();
-	$.PopupManager.initDuedateCheckBox();
-	//$.PopupManager.initDuedateInput();
+	chrome.storage.local.get("enable_complete_date", function(value){
+		if(value.enable_complete_date == undefined)
+		{
+			$.StorageManager.SaveDictionaryData({'enable_complete_date': true});
+		}
+	});
+
+	chrome.storage.local.get("complete_date_input", function(value){
+		if(value.complete_date_input == undefined)
+		{
+			$.PopupManager.setInputBoxCurrentTime($.PopupItemsId.complete_date_input);
+			var input_date = $("#" + $.PopupItemsId.complete_date_input).val();
+			if(input_date)
+			{
+				$.StorageManager.SaveDictionaryData({'complete_date_input': input_date});
+			}
+		}
+	});
 },
 
 initDuedateCheckBox: function()
 {
-	chrome.storage.local.get("duedate_now", function(value){
-		$("#"+$.PopupItemsId.duedate_checkbox).prop('checked', value.duedate_now);
-		console.log(value.duedate_now);
-		if(value.duedate_now == true)
-		{
-			$.PopupManager.setDuedateCurrentTime();
-		}
+	chrome.storage.local.get("enable_duedate", function(value){
+		$("#"+$.PopupItemsId.duedate_checkbox).bootstrapSwitch('state', value.enable_duedate);
 	});
 },
 
@@ -118,31 +234,44 @@ initDuedateInput: function()
 	});
 },
 
-setDuedateCurrentTime: function()
+initCompleteDateCheckBox: function()
+{
+	chrome.storage.local.get("enable_complete_date", function(value){
+		$("#"+$.PopupItemsId.complete_date_checkbox).bootstrapSwitch('state', value.enable_complete_date);
+	});
+},
+
+initCompleteDateInput: function()
+{
+	chrome.storage.local.get("complete_date_input", function(value){
+		$("#" + $.PopupItemsId.complete_date_input).val(value.complete_date_input);
+	});
+},
+setInputBoxCurrentTime: function(input_box)
 {
 	var current_date = new Date();
 	var year = current_date.getFullYear();
 	var mon = ("0" + (current_date.getMonth() + 1)).slice(-2);
 	var day = ("0" + current_date.getDate()).slice(-2);
 
-	$("#"+$.PopupItemsId.duedate_input).val(year + '-' + mon + '-' + day);
+	$("#"+input_box).val(year + '-' + mon + '-' + day);
 },
 };
 
 $.WQ_Animation = {
 
-buttonMoveAnimation: function(speed, fromLeftToRight, callback){
-	var buttonIssue = $("#"+$.PopupItemsId.duedate_button);
+buttonMoveAnimation: function(button, speed, fromLeftToRight, callback){
+	var buttonIssue = $("#"+button);
 //	var buttonWidth = buttonIssue.css('marginLeft')*2+buttonIssue.css('borderLeft')*2+buttonIssue.css('paddingLeft')*2+buttonIssue.width();
 	var buttonWidth = buttonIssue.outerWidth(true);
 	var left = $("#"+$.PopupItemsId.duedate_form).width() - buttonWidth;
 	if(fromLeftToRight == true)
 	{
-		$("#"+$.PopupItemsId.duedate_button).animate({"margin-left": left+"px"}, speed, "swing", callback);
+		$("#"+button).animate({"margin-left": left+"px"}, speed, "swing", callback);
 	}
 	else
 	{
-		$("#"+$.PopupItemsId.duedate_button).animate({"margin-left": "0px"}, speed, "swing", callback);
+		$("#"+button).animate({"margin-left": "0px"}, speed, "swing", callback);
 	}
 },
 
@@ -178,5 +307,6 @@ cannotTouch: function(){
 };
 
 //initial
+$.PopupUI.initUI();
 $.PopupManager.initManager();
 $.WQ_Animation.cannotTouch();
