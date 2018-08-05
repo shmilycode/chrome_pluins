@@ -28,6 +28,10 @@ complete_date_button: "complete-date-button",
 //procesing time id
 processing_time_form: "processing-time-form",
 processing_time_checkbox: "enable-processing-time-checkbox",
+
+//memo id
+memo_form: "memo-form",
+memo_checkbox: "enable-memo-checkbox",
 };
 
 //data index
@@ -45,7 +49,18 @@ SaveDictionaryData: function(data)
 	chrome.storage.local.set(data, function(){
 		$.PopupLog.PopupMention("Date saved!");
 	});
-}
+
+	$.StorageManager.SaveDataToBackground(data);
+},
+
+SaveDataToBackground: function(data)
+{
+	BackgroundControl = chrome.extension.getBackgroundPage();
+	for(key in data)
+	{
+		BackgroundControl.localStorage[key] = data[key];
+	}
+},
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -139,6 +154,26 @@ onCompleteDateInputChange: function()
 ///////////////////////complete date event handle end/////////////////////////
 //////////////////////////////////////////////////////////////////////////
 
+//////////////////////////////////////////////////////////////////////////
+///////////////////////checkbox event handle/////////////////////////
+$('#'+$.PopupItemsId.memo_checkbox).on('ifChecked', function(event){
+	$.StorageManager.SaveDictionaryData({'enable_memo': true});
+});
+
+$('#'+$.PopupItemsId.memo_checkbox).on('ifUnchecked', function(event){
+	$.StorageManager.SaveDictionaryData({'enable_memo': false});
+});
+
+$('#'+$.PopupItemsId.processing_time_checkbox).on('ifChecked', function(event){
+	$.StorageManager.SaveDictionaryData({'enable_processing_time': true});
+});
+
+$('#'+$.PopupItemsId.processing_time_checkbox).on('ifUnchecked', function(event){
+	$.StorageManager.SaveDictionaryData({'enable_processing_time': false});
+});
+///////////////////////checkbox event handle end/////////////////////////
+//////////////////////////////////////////////////////////////////////////
+
 $("#danger-button").click(function(){
 	alert("看什么看，自己加！");
 });
@@ -149,6 +184,7 @@ initUI: function()
 	$.PopupUI.initDuedateForm();
 	$.PopupUI.initCompleteDateForm();
 	$.PopupUI.initProcessingTimeForm();
+	$.PopupUI.initMemoForm();
 },
 
 initDuedateForm: function()
@@ -167,7 +203,20 @@ initCompleteDateForm: function()
 
 initProcessingTimeForm: function()
 {
-	$('#' + $.PopupItemsId.processing_time_checkbox).bootstrapSwitch();
+	$('#' + $.PopupItemsId.processing_time_checkbox).iCheck({
+		checkboxClass: 'icheckbox_flat-blue',
+		radioClass: 'iradio_flat-blue',
+		increaseArea: '20%'
+	});
+},
+
+initMemoForm: function()
+{
+	$('#' + $.PopupItemsId.memo_checkbox).iCheck({
+		checkboxClass: 'icheckbox_flat-blue',
+		radioClass: 'iradio_flat-blue',
+		increaseArea: '20%'
+	});
 }
 };
 
@@ -179,6 +228,8 @@ initManager: function()
 	$.PopupManager.initDuedateCheckBox();
 	$.PopupManager.initCompleteDateInput();
 	$.PopupManager.initCompleteDateCheckBox();
+	$.PopupManager.initMemoCheckBox();
+	$.PopupManager.initProcessingTimeCheckBox();
 },
 
 restoreDefaultDatabase: function()
@@ -218,11 +269,24 @@ restoreDefaultDatabase: function()
 			}
 		}
 	});
+
+	chrome.storage.local.get('enable_memo', function(value){
+		if(value.enable_memo == undefined)
+		{
+			$.StorageManager.SaveDictionaryData({'enable_memo': true});
+		}
+	});
+	chrome.storage.local.get('enable_processing_time', function(value){
+		if(value.enable_processing_time == undefined)
+		{
+			$.StorageManager.SaveDictionaryData({'enable_processing_time': true});
+		}
+	});
 },
 
 initDuedateCheckBox: function()
 {
-	chrome.storage.local.get("enable_duedate", function(value){
+	chrome.storage.local.get('enable_duedate', function(value){
 		$("#"+$.PopupItemsId.duedate_checkbox).bootstrapSwitch('state', value.enable_duedate);
 	});
 },
@@ -246,6 +310,30 @@ initCompleteDateInput: function()
 	chrome.storage.local.get("complete_date_input", function(value){
 		$("#" + $.PopupItemsId.complete_date_input).val(value.complete_date_input);
 	});
+},
+
+initMemoCheckBox: function()
+{
+	chrome.storage.local.get('enable_memo', function(value){
+		if(value.enable_memo == true){
+			$('#'+$.PopupItemsId.memo_checkbox).iCheck('check');
+		}
+		else {
+			$('#'+$.PopupItemsId.memo_checkbox).iCheck('uncheck');
+		}
+	})
+},
+
+initProcessingTimeCheckBox: function()
+{
+	chrome.storage.local.get('enable_processing_time', function(value){
+		if(value.enable_processing_time == true){
+			$('#'+$.PopupItemsId.processing_time_checkbox).iCheck('check');
+		}
+		else {
+			$('#'+$.PopupItemsId.processing_time_checkbox).iCheck('uncheck');
+		}
+	})
 },
 setInputBoxCurrentTime: function(input_box)
 {

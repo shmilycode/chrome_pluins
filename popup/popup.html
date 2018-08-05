@@ -2,9 +2,11 @@
 <head>
 	<link rel="stylesheet" href="./bootstrap/css/bootstrap.min.css">
 	<link rel="stylesheet" href="./bootstrap/css/bootstrap-switch.min.css">
+	<link rel="stylesheet" href="./skins/flat/blue.css">
 	<script src="../jquery/jquery-3.2.0.min.js"></script>
 	<script src="./bootstrap/js/bootstrap.min.js"></script>
 	<script src="./bootstrap/js/bootstrap-switch.min.js"></script>
+	<script src="./bootstrap/js/icheck.min.js"></script>
 	<style>
 	body {
 		width: 320px;
@@ -34,6 +36,7 @@
 <!--navbar-->
 <ul class="nav nav-tabs" id="head-navbar" role="tablist">
 	<li role="presentation" class="active"><a href="#duedate-nav" role="tab" data-toggle="tab">选项</a></li>
+	<li role="presentation"><a href="#checkbox-nav" role="tab" data-toggle="tab">提示框</a></li>
 	<li role="presentation"><a href="#other-nav" role="tab" data-toggle="tab">其他</a></li>
 </ul>
 
@@ -66,24 +69,40 @@
 				<div class="col-xs-6 date-input-padding">
 					<input type="date" class="align-left form-control" id="complete-date-input">
 				</div>
-				<div class="bootstrap-switch bootstrap-switch-wrapper bootstrap-switch-mini form-contro">
+				<div class="bootstrap-switch bootstrap-switch-wrapper bootstrap-switch-mini">
 					<input type="checkbox" id="enable-complete-date-checkbox" checked>
 				</div>
 			</div>
 		</form>
 
+	</div> <!--duedate-nav-->
+
+	<!-- checkbox-tab -->
+	<div role="tabpanel" class="tab-pane fade" id="checkbox-nav">
 		<!-- processing-time-form -->
 		<form class="form-horizontal" id="processing-time-form">
-			<label class="col-xs-2 radio-inline without-padding">
-				耗费时间
-			</label>
 			<div class="form-group">
-				<div class="bootstrap-switch bootstrap-switch-wrapper bootstrap-switch-mini form-contro">
+				<div class="col-xs-2 iradio">
 					<input type="checkbox" id="enable-processing-time-checkbox" checked>
 				</div>
+				<lable class="col-xs-6">
+					耗费时间
+				</lable>
 			</div>
 		</form>
-	</div> <!--duedate-nav-->
+
+		<!-- memo-form -->
+		<form class="form-horizontal" id="memo-form">
+			<div class="form-group">
+				<div class="col-xs-2 iradio">
+					<input type="checkbox" id="enable-memo-checkbox" checked>
+				</div>
+				<lable class="col-xs-6">
+					备注
+				</lable>
+			</div>
+		</form>
+	</div><!-- checkbox-tab -->
 
 	<div role="tabpanel" class="tab-pane fade" id="other-nav">
 		<button type="button" class="btn btn-danger" id="danger-button">加需求</button>

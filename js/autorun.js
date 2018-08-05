@@ -25,8 +25,38 @@ moreItemId: "opsbar-operations_more",
 setDuedate:function(options){
 	var requestContent = {
         timeout: 1000,
-        url: options.url, 
-        type: "post",
+        url: options.url,
+        type: "POST",
+		beforeSend: function(xhr){
+			for(opt in options.requestHeader)
+			{
+				xhr.setRequestHeader(opt, options.requestHeader[opt]);
+			}
+		},
+        data:{
+			"duedate": options.duedate,
+			"issueId": options.issueId,
+			"atl_token": options.atl_token,
+			"singleFieldEdit": options.singleField,
+			"fieldsToForcePresent": options.filedsToForcePresent,
+		},
+        success: function(data){
+			$.WQLog.PMention("duedate request success!");
+        },
+        error:function(XMLHttpRequest, textStatus, errorThrown){
+			$.WQLog.PError(XMLHttpRequest.status);
+			$.WQLog.PError(XMLHttpRequest.readyState);
+			$.WQLog.PError(textStatus);
+        }
+	};
+	$.ajax(requestContent);
+},
+
+setCompleteDate:function(options){
+	var requestContent = {
+        timeout: 1000,
+        url: options.url,
+        type: "POST",
 		beforeSend: function(xhr){
 			for(opt in options.requestHeader)
 			{
@@ -38,10 +68,10 @@ setDuedate:function(options){
 			"issueId": options.issueId,
 			"atl_token": options.atl_token,
 			"singleFieldEdit": options.singleField,
-			"fieldsToForcePresent": "duedate"
+			"fieldsToForcePresent": options.filedsToForcePresent,
 		},
         success: function(data){
-			$.WQLog.PMention("duedate request success!");
+			$.WQLog.PMention("complete date request success!");
         },
         error:function(XMLHttpRequest, textStatus, errorThrown){
 			$.WQLog.PError(XMLHttpRequest.status);
@@ -49,9 +79,7 @@ setDuedate:function(options){
 			$.WQLog.PError(textStatus);
         }
 	};
-	$.ajax(requestContent);     
-//	window.location.reload();//刷新当前页面.
-//	document.getElementById(this.editIssueId).click();
+	$.ajax(requestContent);
 },
 
 listenTurnText:function(){
@@ -80,12 +108,20 @@ buildConnect: function()
 responseHandle: function(rep)
 {
 	//$.autorun.setCurrentDate();
-	if(rep.option == "set_duedate")
+	switch(rep.option)
 	{
+	case "set_duedate":
 		$.autorun.setDuedate(rep.value);
-		//alert("load success!");
+		break;
+	case "set_complete_date":
+		$.autorun.setCompleteDate(rep.value);
+		break;
+	case "reload":
+		document.location.reload();
+		break;
+	default:
+		break;
 	}
-	document.location.reload();
 },
 
 getMetaUserName: function()
@@ -98,7 +134,7 @@ initialize: function()
 {
 	/*
 	$.ajax({
-	url: "test.php", 
+	url: "test.php",
 	success: function(data)
 	{
 		this.data.test_item = testId;
@@ -122,6 +158,25 @@ initialize: function()
 };
 $.autorun.initialize();
 
+/*
+document.getElementById("status-val").onmousedown = function(e){
+	message = {
+		option: "set_duedate",
+		value: {
+			url: "https://jira.cvte.com/secure/AjaxIssueAction.jspa?decorator=none",
+			requestHeader: {"X-AUSERNAME": "chenweiqi",
+							"X-SITEMESH-OFF": true},
+							duedate: "27/八月/17",
+							issueId: 190264,
+							atl_token: "B454-MW68-DZCN-LCWB|24dbdab35a11ea7e08d52faa04f8e6c551fea128|lin",
+							singleField: true,
+							filedsToForcePresent: "duedate",
+				},
+	};
+	$.autorun.setDuedate(message.value);
+	alert("weiqi");
+	return false;
+};
+*/
+
 //$.autorun.listenTurnText();
-
-
